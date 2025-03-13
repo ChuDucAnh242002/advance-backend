@@ -11,11 +11,36 @@ services:
   # A set of needed Docker instructions like 'image:' are shown
   # below, groups should set their values. Groups are free to
   # CRUD the set of instructions as they see fit.
-#  kafka:
-#    image:
-#    networks:
-#    ports:
-#    environment:
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - backend
+  
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_BROKER_ID=0
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=disabled
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - backend
+      
+  emotegen:
+    build: ./backend/emotegen
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKER=kafka:9092
+    networks:
+      - backend
+
 
   server_a:
     build: ./backend/server_a
@@ -42,6 +67,7 @@ services:
 # exposed ports.
 networks:
   backend:
+    driver: bridge
 
 # If you use databases for storing information, you can define
 # their volumes here.
