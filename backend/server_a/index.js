@@ -12,7 +12,6 @@ const getAggregatedEmoteData = async () => {
     await consumer.subscribe({ topic: 'aggregated-emote-data', fromBeginning: true })
 
     await consumer.run({
-        partitionsConsumedConcurrently: 1,
         eachMessage: async ({ topic, partition, message }) => {
             const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
             console.log(`- ${prefix} ${message.key}#${message.value}`)
@@ -20,7 +19,20 @@ const getAggregatedEmoteData = async () => {
     })
 };
 
-getAggregatedEmoteData().catch(e => console.error(`[server_a/consumer] ${e.message}`, e))
+const getRawEmoteData = async () => {
+    await consumer.connect()
+    await consumer.subscribe({ topic: 'raw-emote-data', fromBeginning: true })
+
+    await consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+            const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+            console.log(`- ${prefix} ${message.key}#${message.value}`)
+        },
+    })
+}
+
+getAggregatedEmoteData().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
+getRawEmoteData().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
 
 const errorTypes = ['unhandledRejection', 'uncaughtException']
 const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
