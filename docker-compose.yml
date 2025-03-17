@@ -19,7 +19,7 @@ services:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_ENABLE_KRAFT=yes
       - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
@@ -42,16 +42,17 @@ services:
     networks:
       - backend
 
-#  server_a:
-#    build: ./backend/server_a
-#    ports:
-#      - "3000:3000"
-#    depends_on:
-#     - kafka
-#    environment:
-#      - KAFKA_BROKER=kafka:9092
-#    networks:
-#      - backend
+  server_a:
+    build: ./backend/server_a
+    ports:
+      - "3000:3000"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      - KAFKA_BROKER=kafka:9092
+    networks:
+      - backend
 
   # much of the server_b service entry can be copied from server_a
   # service above. Groups are free to
