@@ -7,7 +7,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 // WebSocket server logic
-io.on("connection", (io) => {
+io.on("connection", (socket) => {
     console.log("Client connected");
 
     // WebSocket handling logic
@@ -16,7 +16,7 @@ io.on("connection", (io) => {
         console.log(`Received message: ${message}`)
 
         // Send a response back to the client
-        io.emit('message', message);
+        socket.emit('message', message);
     });
 });
 

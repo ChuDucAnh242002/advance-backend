@@ -32,8 +32,8 @@ const getRawEmoteData = async () => {
 }
 
 // This is for testing purposes
-// getAggregatedEmoteData().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
-// getRawEmoteData().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
+getAggregatedEmoteData().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
+getRawEmoteData().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
 
 const errorTypes = ['unhandledRejection', 'uncaughtException']
 const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
