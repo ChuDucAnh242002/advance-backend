@@ -1,9 +1,21 @@
-# This is where you define the image for
-# the server B which processes the orders.
+# lightweight Node.js image
+FROM node:18-alpine
 
-# You should then use Noje image from Docker Hub as the basis,
-# and then follow the instructions linked to in assignment document.
-# You should be able to produce a working installation by just
-# following the instructions.
+# Set the working directory inside the container
+WORKDIR /app
 
-#FROM node:version...
+# Copy package.json and package-lock.json before copying the rest
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install 
+
+# Copy the rest of the app files
+COPY . .
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Define the command to start the application
+CMD ["node", "index.js"]
+
