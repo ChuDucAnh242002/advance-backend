@@ -1,27 +1,42 @@
-const express = require("express");
-const http = require("http");
 const { Server } = require("socket.io");
+const { Kafka } = require('kafkajs');
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const PORT = process.env.PORT || 3001;
+const io = new Server(PORT);
 
-// WebSocket server logic
-io.on("connection", (socket) => {
-    console.log("Client connected");
-
-    // WebSocket handling logic
-    socket.on("message", (message) => {
-        // Handle WebSocket messages
-        console.log(`Received message: ${message}`)
-
-        // Send a response back to the client
-        socket.emit('message', message);
-    });
+const kafka = new Kafka({
+    clientId: 'server_a',
+    brokers: [process.env.KAFKA_BROKER || 'localhost:9092']
 });
 
-// Start the server on port 8080
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+const consumer = kafka.consumer({ groupId: 'test-group' });
+
+consumer.connect()
+consumer.subscribe({ topic: 'aggregated-emote-data', fromBeginning: true })
+consumer.subscribe({ topic: 'raw-emote-data', fromBeginning: true })
+
+io.on("connection", async (socket) => {
+    console.log("Client connected");
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
+    });
+
+    const runConsumer = async () => {
+        await consumer.run({
+            eachMessage: async ({ topic, partition, message }) => {
+                const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
+                console.log(`- ${prefix} ${message.key}#${message.value}`)
+
+                if (topic == "aggregated-emote-data") {
+                    io.emit("aggregatedEmoteData", message)
+                }
+                else if (topic == "raw-emote-data") {
+                    io.emit("rawEmoteData", message)
+                }
+            },
+        })
+    }
+
+    runConsumer().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
 });
