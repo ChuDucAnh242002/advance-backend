@@ -4,16 +4,14 @@
   "description": "Consume the aggregated-emote-data -topic and write that to frontend using WebSocket communication.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Chu Duc Anh",
   "license": "ISC",
   "dependencies": {
-    "kafka-node": "^5.0.0",
     "kafkajs": "^2.2.4",
-    "express": "^4.18.2",
-    "http": "^0.0.1-security",
     "socket.io": "^4.5.4"
   }
 }
