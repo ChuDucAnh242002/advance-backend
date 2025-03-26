@@ -1,5 +1,4 @@
-# lightweight Node.js image
-FROM node:18-alpine
+FROM node:22
 
 # Set the working directory inside the container
 WORKDIR /app
