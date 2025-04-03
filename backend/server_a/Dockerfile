@@ -1,16 +1,11 @@
-# This is where you define the image for
-# the server A.
+FROM node:18
 
-# You should use Node image from Docker Hub as the basis.
+WORKDIR /app
 
-#FROM node:version...
+COPY package*.json ./
 
-#WORKDIR ?
+RUN npm install
 
-#COPY ?
+COPY . .
 
-# RUN ?
-
-#COPY . .
-
-#CMD [??]
+CMD [ "npm", "start" ]

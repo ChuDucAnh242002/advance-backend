@@ -1,0 +1,17 @@
+{
+  "name": "server_a",
+  "version": "1.0.0",
+  "description": "Consume the aggregated-emote-data -topic and write that to frontend using WebSocket communication.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Chu Duc Anh",
+  "license": "ISC",
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "socket.io": "^4.5.4"
+  }
+}
