@@ -4,13 +4,13 @@ Server A will get the the aggregated emote data and raw emote data through emote
 
 # Testing
 
-Install the package to test. Note that this package is not required in development, therefore, it is not included in package.json
+# 1. Install test dependency (run this first)
 ```bash
 npm install socket.io-client
 ```
 
-This is the test.js template for testing (not required in development):
-
+# 2. Create and populate the test file server_a/test.js
+```bash
 const { io } = require("socket.io-client");
 
 const URL = "http://localhost:3001"
@@ -24,20 +24,15 @@ socket.on("connect", (data) => {
 socket.on("rawEmoteData", (data) => {
     console.log(`Raw emote data: ${data.value}`)
 })
+```
 
-
-In order to test, emote generator and kafka must be implemented. And the server A will be built using docker compose 
-
+# 3. Build and start services
 ```bash
 docker compose build
+docker compose up &
 ```
 
-And run the all the services with this command (emote generator and kafka are required):
+# 4. Run the test (in a new terminal or after services are up)
 ```bash
-docker compose up
-```
-
-Finally run 
-```bash
-node test.js
+node server_a/test.js
 ```
