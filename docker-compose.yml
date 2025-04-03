@@ -53,13 +53,16 @@ services:
       - KAFKA_BROKER=kafka:9092
     networks:
       - backend
+      - frontend
 
   frontend:
     build: ./frontend
     ports: 
-      - "3000:3000"
+      - "80:80"
     depends_on:
       - server_a
+    networks:
+      - frontend
 
   # much of the server_b service entry can be copied from server_a
   # service above. Groups are free to
@@ -75,6 +78,8 @@ services:
 # exposed ports.
 networks:
   backend:
+    driver: bridge
+  frontend:
     driver: bridge
 
 # If you use databases for storing information, you can define
