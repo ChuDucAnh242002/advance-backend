@@ -2,7 +2,13 @@ const { Server } = require("socket.io");
 const { Kafka } = require('kafkajs');
 
 const PORT = process.env.PORT || 3001;
-const io = new Server(PORT);
+const io = new Server({
+    cors: {
+        origin: "http://localhost:3000"
+    }
+});
+
+io.listen(PORT)
 
 const kafka = new Kafka({
     clientId: 'server_a',
