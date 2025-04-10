@@ -1,7 +1,38 @@
 # Server A
 
-This directory is for the code and documentation of the _server A_. A starter Dockerfile has been added, it has some comments to get you started.
+Server A will get the the aggregated emote data and raw emote data through emote generator and send to the frontend via websocket.
 
-Server A acts as a consumer for at least the _aggregated-emote-data_ topic. You may want to consume also the _raw-emote-data_ topic. Consume the messages and publish those to each WebSocket client.
+# Testing
 
-To get started you should run `npm init` in this directory to initialize the Node project. This will create a `package.json`-file, which is used to define the project's attributes, dependencies etc. You should next create the index.js file.
+# 1. Install test dependency (run this first)
+```bash
+npm install socket.io-client
+```
+
+# 2. Create and populate the test file server_a/test.js
+```bash
+const { io } = require("socket.io-client");
+
+const URL = "http://localhost:3001"
+
+const socket = io(URL)
+
+socket.on("connect", (data) => {
+    console.log("Client connected")
+});
+
+socket.on("rawEmoteData", (data) => {
+    console.log(`Raw emote data: ${data.value}`)
+})
+```
+
+# 3. Build and start services
+```bash
+docker compose build
+docker compose up &
+```
+
+# 4. Run the test (in a new terminal or after services are up)
+```bash
+node server_a/test.js
+```
