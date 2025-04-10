@@ -58,9 +58,9 @@ services:
   frontend:
     build: ./frontend
     ports: 
-      - "80:80"
-    # depends_on:
-    #   - server_a
+      - "3000:3000"
+    depends_on:
+      - server_a
     networks:
       - frontend
 
