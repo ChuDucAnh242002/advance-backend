@@ -1,24 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import EmojiButton from './EmojiButton';
 
 import { socket } from './socket';
 import { ConnectionState } from './ConnectionState';
 
+socket.on("connect", (data) => {
+  console.log("Client connected")
+});
+
 const App = () => {
 
   const [isConnected, setIsConnected] = useState(socket.connected)
 
-  useEffect(() => {
-    const onConnect = () => {
-      setIsConnected(true)
-    }
+  socket.on("connect", (data) => {
+    setIsConnected(true)
+  });
 
-    socket.on('connect', onConnect)
+  socket.on("rawEmoteData", (data) => {
+    console.log(`Raw emote data: ${data.value}`)
+  });
 
-    return () => {
-      socket.off('connect', onConnect)
-    };
-  }, [])
+  socket.on("connect_error", (err) => {
+    console.log(`connect_error due to ${err.message}`);
+  });
+
+  socket.on("error", (err) => {
+    console.log("General socket error:", err);
+  });
 
   return (
     <div>
@@ -34,7 +42,7 @@ const App = () => {
         <EmojiButton symbol="😢" label="cry" />
         <EmojiButton symbol="😡" label="angry" />
       </div >
-    </div>
+    </div >
   );
 }
 
