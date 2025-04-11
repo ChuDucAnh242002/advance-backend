@@ -68,13 +68,13 @@ services:
         - backend
 
   frontend:
-  build: ./frontend
-  ports: 
-    - "3000:3000"
-  depends_on:
-    - server_a
-  networks:
-    - frontend
+    build: ./frontend
+    ports: 
+      - "3000:3000"
+    depends_on:
+      - server_a
+    networks:
+      - frontend
 
 # Here we create a named network, that all the backend components
 # must be added to for them to be able to communicate through

@@ -49,6 +49,6 @@ io.on("connection", async (socket) => {
     runConsumer().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${server.address().port}`);
 });
