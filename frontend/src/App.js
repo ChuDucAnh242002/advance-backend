@@ -17,7 +17,8 @@ const App = () => {
   });
 
   socket.on("rawEmoteData", (data) => {
-    console.log(`Raw emote data: ${data.value}`)
+    let sentence = `Raw emote data: ${data.value}`
+    console.log(sentence)
   });
 
   socket.on("connect_error", (err) => {
