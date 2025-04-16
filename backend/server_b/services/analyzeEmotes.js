@@ -1,9 +1,6 @@
-// const { getConfig } = require('./configManager');
-
-export const analyzeEmotes = emoteData => {
+export const analyzeEmotes = (emoteData, threshold) => {
     const significantMoments = [];
     const emoteCounts = {};
-    const threshold = 0.2;
 
     emoteData.forEach(record => {
         const timestamp = record.timestamp.slice(0, 16); // Minute-level granularity

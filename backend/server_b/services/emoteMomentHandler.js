@@ -1,5 +1,7 @@
 const { Kafka } = require('kafkajs');
 const { analyzeEmotes } = require('./analyzeEmotes');
+const { getConfig } = require('./configManager');
+
 
 const kafka = new Kafka({
     clientId: 'server_b',
@@ -9,6 +11,8 @@ const kafka = new Kafka({
 const consumerTopic = 'raw-emote-data';
 
 const consumer = kafka.consumer({ groupId: 'server_b_group' });
+
+const { threshold } = getConfig();
 
 const consumRawEmotes = async () => {
     await consumer.connect()
@@ -21,7 +25,7 @@ const consumRawEmotes = async () => {
           emoteCollection.push(JSON.parse(message.value.toString()));
 
         }else{
-            console.log(analyzeEmotes(emoteCollection));
+            console.log(analyzeEmotes(emoteCollection, threshold));
             console.log(JSON.stringify(emoteCollection, null, 2));
             emoteCollection.length = 0;
             emoteCollection.push(JSON.parse(message.value.toString()));
