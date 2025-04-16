@@ -50,7 +50,17 @@ app.post('/emote', async (req, res) => {
 app.get('/settings/threshold', (_req, res) => {
   const {threshold} = getConfig();
     res.json({ threshold });
-});   
+});
+
+app.post('/settings/threshold', (req, res) => {
+  const {threshold} = getConfig();
+  const newThreshold = req.body.threshold;
+  if(!newThreshold || isNaN(newThreshold) || newThreshold < 0 || newThreshold > 1){
+    res.status(400).json({ error: 'Invalid threshold. Must be a number between 0 and 1.' });
+  }
+   updateConfig({ threshold: newThreshold });
+    res.json({ message: `Threshold updated to ${newThreshold}` });
+});  
 
 
 app.listen(port, () => {
