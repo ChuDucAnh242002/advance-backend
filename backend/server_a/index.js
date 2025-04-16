@@ -1,8 +1,16 @@
+const http = require('http')
 const { Server } = require("socket.io");
 const { Kafka } = require('kafkajs');
 
+const server = http.createServer();
+
 const PORT = process.env.PORT || 3001;
-const io = new Server(PORT);
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"]
+    }
+});
 
 const kafka = new Kafka({
     clientId: 'server_a',
@@ -39,4 +47,8 @@ io.on("connection", async (socket) => {
     }
 
     runConsumer().catch(e => console.error(`[server_a/getRawEmoteData] ${e.message}`, e))
+});
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${server.address().port}`);
 });

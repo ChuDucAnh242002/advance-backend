@@ -11,6 +11,7 @@
   "author": "Chu Duc Anh",
   "license": "ISC",
   "dependencies": {
+    "http": "^0.0.1-security",
     "kafkajs": "^2.2.4",
     "socket.io": "^4.5.4"
   }

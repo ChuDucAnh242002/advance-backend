@@ -53,7 +53,7 @@ services:
       - KAFKA_BROKER=kafka:9092
     networks:
       - backend
-
+      - frontend
 
   server_b:
       build: ./backend/server_b
@@ -67,11 +67,22 @@ services:
       networks:
         - backend
 
+  frontend:
+    build: ./frontend
+    ports: 
+      - "3000:3000"
+    depends_on:
+      - server_a
+    networks:
+      - frontend
+
 # Here we create a named network, that all the backend components
 # must be added to for them to be able to communicate through
 # exposed ports.
 networks:
   backend:
+    driver: bridge
+  frontend:
     driver: bridge
 
 # If you use databases for storing information, you can define
