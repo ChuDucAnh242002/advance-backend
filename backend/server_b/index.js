@@ -1,11 +1,12 @@
 const express = require('express')
 const dotenv = require('dotenv');
-const { getConfig } = require('./services/configManager');
+const { getConfig, updateConfig } = require('./services/configManager');
 require('./services/emoteMomentHandler');
 
 dotenv.config();
 
-const app = express()
+const app = express();
+app.use(express.json());
 const port = process.env.PORT || 8000;
 
 app.get('/', (_req, res) => {
@@ -15,6 +16,35 @@ app.get('/', (_req, res) => {
 app.get('/emote', (_req, res) => {
   const { emotes } = getConfig();
     res.json({ emotes });
+});
+
+app.post('/emote', async (req, res) => {
+  const { emotes } = getConfig();
+  console.log(req.body);
+  const id = req.body.id;
+  const action = req.body.action;
+  const emote = emotes.find(e => e.id === id);
+
+  if(!['allow', 'disable'].includes(action)){
+    res.status(400).json({ error: 'Invalid action. Use "allow" or "disable".' });
+    };
+
+  if(!emote){
+    res.status(400).json({ error: 'Emote not found.' });
+  }  
+
+  const updatedEmotes = emotes.map(e => {
+    if(e.id === id){
+      return { ...e, active: action === 'allow' ? true : false };
+    }
+    return e;
+  }
+  );
+
+  
+  await updateConfig({emotes: updatedEmotes});
+
+  res.json({ message: `${action} ${emote.value} emote successfully!` });
 });
 
 app.get('/settings/threshold', (_req, res) => {

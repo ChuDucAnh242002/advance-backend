@@ -3,23 +3,28 @@
     "emotes": [
         {
             "value": "❤️",
-            "active": true
+            "active": true,
+            "id": "1"
         },
         {
             "value": "👍",
-            "active": true
+            "active": true,
+            "id": "2"
         },
         {
             "value": "😢",
-            "active": true
+            "active": true,
+            "id": "3"
         },
         {
             "value": "😡",
-            "active": true
+            "active": true,
+            "id": "4"
         },
         {
             "value": "😂",
-            "active": true
+            "active": true,
+            "id": "5"
         }
     ]
 }
