@@ -1,3 +1,30 @@
 {
-    "threshold": 5
+    "threshold": 0.5,
+    "emotes": [
+        {
+            "value": "❤️",
+            "active": true,
+            "id": "1"
+        },
+        {
+            "value": "👍",
+            "active": true,
+            "id": "2"
+        },
+        {
+            "value": "😢",
+            "active": true,
+            "id": "3"
+        },
+        {
+            "value": "😡",
+            "active": true,
+            "id": "4"
+        },
+        {
+            "value": "😂",
+            "active": true,
+            "id": "5"
+        }
+    ]
 }
