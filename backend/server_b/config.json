@@ -1,3 +1,25 @@
 {
-    "threshold": 0.5
+    "threshold": 0.5,
+    "emotes": [
+        {
+            "value": "❤️",
+            "active": true
+        },
+        {
+            "value": "👍",
+            "active": true
+        },
+        {
+            "value": "😢",
+            "active": true
+        },
+        {
+            "value": "😡",
+            "active": true
+        },
+        {
+            "value": "😂",
+            "active": true
+        }
+    ]
 }

@@ -12,6 +12,11 @@ app.get('/', (_req, res) => {
   res.send('Hello World!')
 })
 
+app.get('/emote', (_req, res) => {
+  const { emotes } = getConfig();
+    res.json({ emotes });
+});
+
 app.get('/settings/threshold', (_req, res) => {
   const {threshold} = getConfig();
     res.json({ threshold });
