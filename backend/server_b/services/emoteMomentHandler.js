@@ -1,4 +1,5 @@
 const { Kafka } = require('kafkajs');
+const { analyzeEmotes } = require('./analyzeEmotes');
 
 const kafka = new Kafka({
     clientId: 'server_b',
@@ -13,11 +14,18 @@ const consumRawEmotes = async () => {
     await consumer.connect()
     await consumer.subscribe({ topic: consumerTopic, fromBeginning: true })
     
+    const emoteCollection = [];
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
-        console.log({
-          value: message.value.toString(),
-        })
+        if(emoteCollection.length < 100){
+          emoteCollection.push(JSON.parse(message.value.toString()));
+
+        }else{
+            console.log(analyzeEmotes(emoteCollection));
+            console.log(JSON.stringify(emoteCollection, null, 2));
+            emoteCollection.length = 0;
+            emoteCollection.push(JSON.parse(message.value.toString()));
+        }
       },
     })
 };
