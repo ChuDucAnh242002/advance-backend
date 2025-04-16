@@ -1,3 +1,4 @@
+require('./services/emoteMomentHandler');
 const express = require('express')
 const dotenv = require('dotenv');
 const { getConfig } = require('./services/configManager');
