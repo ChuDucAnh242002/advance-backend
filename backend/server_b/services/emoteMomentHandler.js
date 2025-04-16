@@ -18,12 +18,16 @@ const producerTopic = 'aggregated-emote-data';
 const { threshold } = getConfig();
 
 const sendMeaningfulMoments = async (moments) => {
+    try{
     await admin.connect();
-    await admin.createTopics({
+    const topic = await admin.listTopics();
+    if(!topic.includes(producerTopic)){
+      await admin.createTopics({
         topics: [
             { topic: producerTopic, numPartitions: 1, replicationFactor: 1 }
         ]
     });
+    }
     await producer.connect();
     await producer.send({
         topic: producerTopic,
@@ -32,6 +36,9 @@ const sendMeaningfulMoments = async (moments) => {
     await producer.disconnect();
     await admin.disconnect();
     console.log('Meaningful moments sent to producer:', moments);
+    }catch(error){
+        console.error('Error sending meaningful moments:', error);
+    }
  };
 
 const consumRawEmotes = async () => {
