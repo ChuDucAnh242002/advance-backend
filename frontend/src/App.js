@@ -47,8 +47,10 @@ const App = () => {
       console.log("General socket error:", err);
     });
 
-    // let dataEmotes = getEmotes()
-    // setEmotes(dataEmotes)
+    let dataEmotes = getEmotes()
+    if (dataEmotes !== null && dataEmotes !== undefined) {
+      setEmotes(dataEmotes)
+    }
 
     // let dataInterval = getInterval()
     // setInterval(dataInterval)
@@ -66,7 +68,7 @@ const App = () => {
   }, [])
 
   const getEmotes = () => {
-    fetch('http://localhost:8000/emote')
+    fetch('/api/emote')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok')
