@@ -13,12 +13,12 @@ app.get('/', (_req, res) => {
   res.send('Hello World!')
 })
 
-app.get('/emote', (_req, res) => {
+app.get('/settings/allowed-emotes', (_req, res) => {
   const { emotes } = getConfig();
     res.json({ emotes });
 });
 
-app.post('/emote', async (req, res) => {
+app.post('/settings/allowed-emotes', async (req, res) => {
   const { emotes } = getConfig();
   console.log(req.body);
   const id = req.body.id;
