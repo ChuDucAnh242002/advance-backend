@@ -67,6 +67,15 @@ app.get('/settings/interval', (_req, res) => {
     res.json({ interval });
 });
 
+app.post('/settings/interval', (req, res) => {
+  const { interval} = req.body;
+  if(!interval || isNaN(interval) || interval < 0){
+    res.status(400).json({ error: 'Invalid interval. Must be a positive number.' });
+  }
+  updateConfig({ interval });
+  res.json({ message: `Interval updated to ${interval} ms` });
+});
+
 
 app.listen(port, () => {
   console.log(`app listening on port ${port}`)
