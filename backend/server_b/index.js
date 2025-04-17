@@ -60,7 +60,12 @@ app.post('/settings/threshold', (req, res) => {
   }
    updateConfig({ threshold: newThreshold });
     res.json({ message: `Threshold updated to ${newThreshold}` });
-});  
+}); 
+
+app.get('/settings/interval', (_req, res) => {
+  const { interval } = getConfig();
+    res.json({ interval });
+});
 
 
 app.listen(port, () => {
