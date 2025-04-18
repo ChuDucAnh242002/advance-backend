@@ -9,3 +9,34 @@ export const socket = io(URL, {
     reconnectionAttempts: 5,
     reconnectionDelay: 1000
 });
+
+export const connectSocket = (setIsConnected) => {
+    socket.connect()
+
+    socket.on("connect", (data) => {
+        setIsConnected(true)
+    });
+
+    socket.on("disconnect", (reason) => {
+        setIsConnected(false)
+        if (reason === "transport close") {
+            socket.connect()
+        }
+    })
+
+    socket.on("connect_error", (err) => {
+        console.log(`connect_error due to ${err.message}`);
+    });
+
+    socket.on("error", (err) => {
+        console.log("General socket error:", err);
+    });
+}
+
+export const disconnectSocket = () => {
+    socket.off("connect");
+    socket.off("aggregatedEmoteData");
+    socket.off("connect_error");
+    socket.off("error");
+    socket.disconnect();
+}
