@@ -1,48 +1,28 @@
-import React, { useState } from 'react';
-import EmojiButton from './EmojiButton';
+import React, { useEffect, useState } from 'react';
 
-import { socket } from './socket';
+import { socket, connectSocket, disconnectSocket } from './socket';
 import { ConnectionState } from './ConnectionState';
-
-socket.on("connect", (data) => {
-  console.log("Client connected")
-});
+import { Emote } from './Emote';
+import { Interval } from './Interval';
+import { Threshold } from './Threshold';
 
 const App = () => {
-
   const [isConnected, setIsConnected] = useState(socket.connected)
 
-  socket.on("connect", (data) => {
-    setIsConnected(true)
-  });
+  useEffect(() => {
+    connectSocket(setIsConnected);
 
-  socket.on("rawEmoteData", (data) => {
-    let sentence = `Raw emote data: ${data.value}`
-    console.log(sentence)
-  });
-
-  socket.on("connect_error", (err) => {
-    console.log(`connect_error due to ${err.message}`);
-  });
-
-  socket.on("error", (err) => {
-    console.log("General socket error:", err);
-  });
+    return () => {
+      disconnectSocket();
+    }
+  }, [])
 
   return (
     <div>
-      <div>
-        This is the fronend
-      </div>
-      <div>
-        <ConnectionState isConnected={isConnected} />
-      </div>
-      <div >
-        <EmojiButton symbol="❤️" label="heart" />
-        <EmojiButton symbol="👍" label="like" />
-        <EmojiButton symbol="😢" label="cry" />
-        <EmojiButton symbol="😡" label="angry" />
-      </div >
+      <Emote />
+      <ConnectionState isConnected={isConnected} />
+      <Interval />
+      <Threshold />
     </div >
   );
 }

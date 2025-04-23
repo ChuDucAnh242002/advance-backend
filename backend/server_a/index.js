@@ -9,7 +9,10 @@ const io = new Server(server, {
     cors: {
         origin: "http://localhost:3000",
         methods: ["GET", "POST"]
-    }
+    },
+    pingInterval: 5000,
+    pingTimeout: 5000,
+    connectionStateRecovery: true,
 });
 
 const kafka = new Kafka({
@@ -17,7 +20,7 @@ const kafka = new Kafka({
     brokers: [process.env.KAFKA_BROKER || 'localhost:9092']
 });
 
-const consumer = kafka.consumer({ groupId: 'test-group' });
+const consumer = kafka.consumer({ groupId: 'server_a_group' });
 
 consumer.connect()
 consumer.subscribe({ topic: 'aggregated-emote-data', fromBeginning: true })
@@ -33,14 +36,8 @@ io.on("connection", async (socket) => {
     const runConsumer = async () => {
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
-                const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`
-                console.log(`- ${prefix} ${message.key}#${message.value}`)
-
                 if (topic == "aggregated-emote-data") {
                     io.emit("aggregatedEmoteData", message)
-                }
-                else if (topic == "raw-emote-data") {
-                    io.emit("rawEmoteData", message)
                 }
             },
         })

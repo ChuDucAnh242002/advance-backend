@@ -66,6 +66,7 @@ services:
         - KAFKA_BROKER=kafka:9092
       networks:
         - backend
+        - frontend
 
   frontend:
     build: ./frontend
@@ -73,6 +74,7 @@ services:
       - "3000:3000"
     depends_on:
       - server_a
+      - server_b
     networks:
       - frontend
 

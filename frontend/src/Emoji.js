@@ -1,16 +1,16 @@
 import React from 'react';
 
-const EmojiButton = (props) => {
+const Emoji = (props) => {
     return (
-        <button
+        <span
             className="emoji"
             role="img"
             aria-label={props.label ? props.label : ""}
             aria-hidden={props.label ? "false" : "true"}
         >
             {props.symbol}
-        </button>
+        </span>
     )
 };
 
-export default EmojiButton;
+export default Emoji;

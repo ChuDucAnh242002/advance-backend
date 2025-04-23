@@ -18,21 +18,6 @@ FROM development AS build
 
 RUN npm run build
 
-FROM development AS dev-envs
-RUN <<EOF
-apt-get update
-apt-get install -y --no-install-recommends git
-EOF
-
-RUN <<EOF
-useradd -s /bin/bash -m vscode
-groupadd docker
-usermod -aG docker vscode
-EOF
-
-COPY --from=gloursdocker/docker / /
-CMD ["npm", "start"]
-
 FROM nginx:alpine
 
 COPY --from=build /app/.nginx/nginx.conf /etc/nginx/conf.d/default.conf
