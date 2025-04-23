@@ -35,8 +35,8 @@ export const connectSocket = (setIsConnected) => {
 
 export const disconnectSocket = () => {
     socket.off("connect");
-    socket.off("aggregatedEmoteData");
+    socket.off("disconnect");
     socket.off("connect_error");
     socket.off("error");
-    socket.disconnect();
+    // socket.disconnect();
 }

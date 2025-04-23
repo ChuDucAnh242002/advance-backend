@@ -22,6 +22,9 @@ export const Emote = () => {
             }
         });
 
+        return () => {
+            socket.off("aggregatedEmoteData");
+        }
     }, [])
 
     const loadEmotes = async () => {
@@ -53,7 +56,7 @@ export const Emote = () => {
                 {emotes.map((emote, index) => {
                     return <div>
                         <Emoji key={emote.id} symbol={emote.value} />
-                        <button >{getEmoteStatus(emote.status)}</button>
+                        <button onClick={() => handleOnClickEmote(emote)}>{getEmoteStatus(emote.active)}</button>
                     </div>
                 })}
             </div>)
@@ -73,16 +76,20 @@ export const Emote = () => {
         }
     }
 
-    // const handleOnClickEmote = (changedEmote) => {
-    //   const updatedEmotes = emotes.map((emote) => {
-    //     if (emote.id === changedEmote.id) {
-    //       changedEmote.active = !changedEmote.active
-    //       return changedEmote
-    //     }
-    //   })
-    //   postEmotes(changedEmote)
-    //   setEmotes(updatedEmotes)
-    // }
+    const handleOnClickEmote = (changedEmote) => {
+
+        const updatedEmotes = emotes.map((emote) => {
+            if (emote.id === changedEmote.id) {
+                changedEmote.active = !changedEmote.active
+                return changedEmote
+            }
+            else {
+                return emote
+            }
+        })
+        postEmotes(changedEmote)
+        setEmotes(updatedEmotes)
+    }
 
     return (
         <>

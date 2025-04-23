@@ -10,7 +10,7 @@ const io = new Server(server, {
         origin: "http://localhost:3000",
         methods: ["GET", "POST"]
     },
-    pingInterval: 10000,
+    pingInterval: 5000,
     pingTimeout: 5000,
     connectionStateRecovery: true,
 });

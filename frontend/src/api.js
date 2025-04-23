@@ -70,10 +70,7 @@ export const postEmotes = async (emote) => {
             },
             body: JSON.stringify({
                 value: emote.value,
-                active: () => {
-                    if (emote.active) return "allow"
-                    else return "disable"
-                },
+                action: emote.active ? "allow" : "disable",
                 id: emote.id
             })
         })
