@@ -41,6 +41,17 @@ const sendMessage = async (message) => {
 const generateEmotes = async () => {
     await createTopics();
     await producer.connect();
+    const interval = await axios.get('http://server_b:8000/settings/interval',
+        { headers: { 'Content-Type': 'application/json' } }
+    ).then(response => {
+        if (response.status !== 200) {
+            console.error('Error fetching interval:', response.statusText);
+            return 1000;
+        }
+        return response.data.interval;
+    }
+    ) || 1000;
+
     setInterval(async () => {
         const emotes = await axios.get('http://server_b:8000/settings/allowed-emotes', 
             { headers: { 'Content-Type': 'application/json' } }
@@ -68,7 +79,7 @@ const generateEmotes = async () => {
                 await sendMessage(message);
             }
         }
-    }, 1000);
+    }, interval);
 };
 
 generateEmotes().catch(console.error);
