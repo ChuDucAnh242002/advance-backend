@@ -4,12 +4,13 @@
     "description": "Spawns emote data for Kafka",
     "main": "index.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Antti Sand",
     "license": "ISC",
     "dependencies": {
-      "kafka-node": "^5.0.0",
-      "kafkajs": "^2.2.4"
+        "axios": "^1.8.4",
+        "kafka-node": "^5.0.0",
+        "kafkajs": "^2.2.4"
     }
 }
