@@ -41,6 +41,21 @@ const sendMessage = async (message) => {
 const generateEmotes = async () => {
     await createTopics();
     await producer.connect();
+
+    let interval = 1000;
+    try {
+        const response = await axios.get('http://server_b:8000/settings/interval', 
+            { headers: { 'Content-Type': 'application/json' } }
+        );
+        if (response.status === 200 && response.data.interval) {
+            interval = response.data.interval;
+        } else {
+            console.error('Error fetching interval:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error fetching interval:', error.message);
+    }
+
     setInterval(async () => {
         const emotes = await axios.get('http://server_b:8000/settings/allowed-emotes', 
             { headers: { 'Content-Type': 'application/json' } }
@@ -50,7 +65,11 @@ const generateEmotes = async () => {
                 return [];
             }
             return response.data.emotes.filter(emote => emote.active).map(emote => emote.value);
-        })
+        }).catch(error => {
+            console.error('Error fetching emotes:', error.message);
+            return [];
+        });
+
         if (!emotes || emotes.length === 0) {
             console.log('No active emotes available.');
             return;
@@ -68,7 +87,7 @@ const generateEmotes = async () => {
                 await sendMessage(message);
             }
         }
-    }, 1000);
+    }, interval);
 };
 
 generateEmotes().catch(console.error);
