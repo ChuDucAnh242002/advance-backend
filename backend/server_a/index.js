@@ -10,6 +10,7 @@ const io = new Server(server, {
         origin: "http://localhost:3000",
         methods: ["GET", "POST"]
     },
+    // The settings ensure that the server will connect to the frontend
     pingInterval: 5000,
     pingTimeout: 5000,
     connectionStateRecovery: true,
@@ -27,12 +28,14 @@ consumer.subscribe({ topic: 'aggregated-emote-data', fromBeginning: true })
 consumer.subscribe({ topic: 'raw-emote-data', fromBeginning: true })
 
 io.on("connection", async (socket) => {
+    // If the connection is on then log client connected
     console.log("Client connected");
 
     socket.on("disconnect", () => {
         console.log("Client disconnected");
     });
 
+    // For each message that the consumer receives, emit the message for the frontend to use
     const runConsumer = async () => {
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
