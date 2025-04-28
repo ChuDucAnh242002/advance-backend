@@ -9,7 +9,7 @@ export const Threshold = () => {
 
     useEffect(() => {
         loadThreshold();
-    }, [])
+    }, []);
 
     const loadThreshold = async () => {
         setIsLoading(true);
@@ -50,12 +50,14 @@ export const Threshold = () => {
         setIsLoading(true);
         setError(null);
         try {
-            await postThreshold(updatedThreshold);
+            const message = await postThreshold(updatedThreshold);
+            console.log(message);
             setThreshold(updatedThreshold);
         } catch (err) {
             setError("Failed to update threshold");
             console.error("Error updating threshold:", err);
         } finally {
+            setUpdatedThreshold("");
             setIsLoading(false);
         }
     };

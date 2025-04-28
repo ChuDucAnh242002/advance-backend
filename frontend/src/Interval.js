@@ -1,15 +1,15 @@
-import { getInterval, postInterval } from "./api"
-import { useState, useEffect } from "react"
+import { getInterval, postInterval } from "./api";
+import { useState, useEffect } from "react";
 
 export const Interval = () => {
-    const [interval, setInterval] = useState(1000)
-    const [updatedInterval, setUpdatedInterval] = useState()
+    const [interval, setInterval] = useState(1000);
+    const [updatedInterval, setUpdatedInterval] = useState();
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        loadInterval()
-    }, [])
+        loadInterval();
+    }, []);
 
     const loadInterval = async () => {
         setIsLoading(true);
@@ -17,7 +17,7 @@ export const Interval = () => {
         try {
             const dataInterval = await getInterval();
             if (dataInterval !== null) {
-                setInterval(dataInterval)
+                setInterval(dataInterval);
             }
         } catch (err) {
             setError("Failed to load interval");
@@ -47,20 +47,21 @@ export const Interval = () => {
 
         const validationError = validateInterval(updatedInterval)
         if (validationError) {
-            setError(validationError)
+            setError(validationError);
             return;
         }
 
         setIsLoading(true);
         setError(null);
         try {
-            await postInterval(updatedInterval);
+            const message = await postInterval(updatedInterval);
+            console.log(message);
             setInterval(updatedInterval);
         } catch (err) {
             setError("Failed to update interval");
             console.error("Error updating interval:", err);
         } finally {
-            setUpdatedInterval(null)
+            setUpdatedInterval("");
             setIsLoading(false);
         }
     };
@@ -82,4 +83,4 @@ export const Interval = () => {
             </form>
         </div>
     );
-}
+};
