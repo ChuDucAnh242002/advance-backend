@@ -2,6 +2,7 @@ export const analyzeEmotes = (emoteData, threshold) => {
     const significantMoments = [];
     const emoteCounts = {};
 
+    // Update a count of how many times an emote appears at different minute levels
     emoteData.forEach(record => {
         const timestamp = record.timestamp.slice(0, 16); // Minute-level granularity
         const emote = record.emote;
@@ -18,6 +19,7 @@ export const analyzeEmotes = (emoteData, threshold) => {
         emoteCounts[timestamp].total++;
     });
 
+    // filter out emojis that haven't met certain threshold. The selected emojis are added to significantMomenets
     for (const timestamp in emoteCounts) {
         const counts = emoteCounts[timestamp];
         const totalEmotes = counts.total;
