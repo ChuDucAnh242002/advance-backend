@@ -1,46 +1,86 @@
-import { getInterval, postInterval } from "./api"
-import { useState, useEffect } from "react"
+import { getInterval, postInterval } from "./api";
+import { useState, useEffect } from "react";
 
 export const Interval = () => {
-    const [interval, setInterval] = useState(1000)
-    const [updatedInterval, setUpdatedInterval] = useState(1000)
+    const [interval, setInterval] = useState(1000);
+    const [updatedInterval, setUpdatedInterval] = useState();
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        loadInterval()
-    }, [])
+        loadInterval();
+    }, []);
 
     const loadInterval = async () => {
-        const dataInterval = await getInterval()
-        console.log(dataInterval)
-        if (dataInterval !== null && dataInterval !== undefined) {
-            setInterval(dataInterval)
-            setUpdatedInterval(dataInterval)
+        setIsLoading(true);
+        setError(null);
+        try {
+            const dataInterval = await getInterval();
+            if (dataInterval !== null) {
+                setInterval(dataInterval);
+            }
+        } catch (err) {
+            setError("Failed to load interval");
+            console.error("Error loading interval:", err);
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
 
-    const updateInterval = () => {
-        if (updatedInterval !== null && updatedInterval !== undefined) {
-            setInterval(updatedInterval)
+    const validateInterval = (value) => {
+        if (typeof value === 'string' && value.includes('.')) {
+            return "Interval must be an integer";
         }
-    }
 
-    const handleOnClickIntervalButton = (e) => {
-        postInterval(updatedInterval)
-        updateInterval()
-    }
+        const num = parseInt(value);
+        if (isNaN(num)) {
+            return "Interval must be a number";
+        }
+        if (num < 0) {
+            return "Interval must be a positive integer";
+        }
+        return null;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const validationError = validateInterval(updatedInterval)
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        try {
+            const message = await postInterval(updatedInterval);
+            console.log(message);
+            setInterval(updatedInterval);
+        } catch (err) {
+            setError("Failed to update interval");
+            console.error("Error updating interval:", err);
+        } finally {
+            setUpdatedInterval("");
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <>
-            <p>
-                Interval: {interval}
-            </p>
-            <div>
+        <div>
+            <p>Current Interval: {interval}</p>
+            <form onSubmit={handleSubmit}>
                 <input
-                    type="text"
-                    onChange={(event) => setUpdatedInterval(event.target.value)}
-                    placeholder='Type to change interval, interval is in second'>
-                </input>
-                <button onClick={handleOnClickIntervalButton}>Change Interval</button>
-            </div>
-        </>
-    )
-}
+                    value={updatedInterval}
+                    onChange={(e) => setUpdatedInterval(e.target.value)}
+                    disabled={isLoading}
+                    placeholder="Enter interval (in ms)"
+                />
+                <button type="submit" disabled={isLoading}>
+                    Change interval
+                </button>
+                {error && <div style={{ color: 'red' }}>{error}</div>}
+            </form>
+        </div>
+    );
+};

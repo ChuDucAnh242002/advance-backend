@@ -5,102 +5,128 @@ import Emoji from "./Emoji";
 
 export const Emote = () => {
 
-    const [emotes, setEmotes] = useState([])
-    const [aggregatedEmotes, setAggregatedEmotes] = useState([])
+    const [emotes, setEmotes] = useState([]);
+    const [aggregatedEmotes, setAggregatedEmotes] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        loadEmotes()
-
-        socket.on("aggregatedEmoteData", (message) => {
+        const handleSocketMessage = (message) => {
             try {
                 const decoder = new TextDecoder("utf-8");
-                const jsonstring = decoder.decode(message.value)
-                const parsedData = JSON.parse(jsonstring)
-                setAggregatedEmotes(parsedData)
+                const jsonstring = decoder.decode(message.value);
+                const parsedData = JSON.parse(jsonstring);
+                setAggregatedEmotes(parsedData);
             } catch (error) {
                 console.error("Failed to parse socket data:", error);
+                setError("Failed to handle socket aggregated emotes");
             }
-        });
+        };
+
+        const loadData = async () => {
+            try {
+                setError(null);
+                await loadEmotes();
+                socket.on("aggregatedEmoteData", handleSocketMessage);
+            } catch (error) {
+                console.error("Failed to load emotes:", error);
+                setError("Failed to load emotes");
+            }
+        }
+
+        loadData();
 
         return () => {
             socket.off("aggregatedEmoteData");
         }
-    }, [])
+    }, []);
 
     const loadEmotes = async () => {
-        const dataEmotes = await getEmotes();
-        if (dataEmotes !== null && dataEmotes !== undefined) {
-            setEmotes(dataEmotes)
+        try {
+            const dataEmotes = await getEmotes();
+            if (dataEmotes) {
+                setEmotes(dataEmotes);
+            }
+        } catch (error) {
+            throw error;
         }
-    }
+
+    };
 
     const getEmoteStatus = (emojiStatus) => {
-        if (emojiStatus) {
-            return "Active"
-        } else {
-            return "Inactive"
+        return emojiStatus ? "Active" : "Inactive";
+    };
+
+    const handleOnClickEmote = async (changedEmote) => {
+        try {
+            setEmotes(prevEmotes =>
+                prevEmotes.map((emote) => {
+                    if (emote.id === changedEmote.id) {
+                        return { ...emote, active: !emote.active };
+                    } else {
+                        return emote;
+                    }
+                }));
+            const message = await postEmotes({ ...changedEmote, active: !changedEmote.active });
+            console.log(message);
+            setError(null);
+        } catch (error) {
+            console.error("Failed to update emote status:", error);
+            setError("Failed to update emote status");
         }
-    }
+
+    };
 
     const renderEmotes = () => {
         if (emotes.length === 0) {
-            return (<div>
-                <Emoji symbol="❤️" label="heart" />
-                <Emoji symbol="👍" label="like" />
-                <Emoji symbol="😢" label="cry" />
-                <Emoji symbol="😡" label="angry" />
-            </div>)
+            return (
+                <div>
+                    {["❤️", "👍", "😢", "😡"].map((emoji, index) => {
+                        <Emoji key={index} symbol={emoji} />
+                    })}
+                </div>
+            );
         }
-        else {
-            return (<div>
+
+        return (
+            <div>
                 {emotes.map((emote, index) => {
-                    return <div>
-                        <Emoji key={emote.id} symbol={emote.value} />
-                        <button onClick={() => handleOnClickEmote(emote)}>{getEmoteStatus(emote.active)}</button>
-                    </div>
+                    return (
+                        <div>
+                            <Emoji key={emote.id} symbol={emote.value} />
+                            <button onClick={() => handleOnClickEmote(emote)}>{getEmoteStatus(emote.active)}</button>
+                        </div>
+                    )
                 })}
-            </div>)
-        }
-    }
+            </div>
+        );
+    };
 
     const renderAggregatedEmotes = () => {
         if (aggregatedEmotes.length === 0) {
-            return (<div></div>)
+            return (<div></div>);
         }
         else {
-            return (<div>
-                {aggregatedEmotes.map((aggregatedEmote, index) => {
-                    return <Emoji key={index} symbol={aggregatedEmote.emote} />
-                })}
-            </div>)
+            return (
+                <div>
+                    {aggregatedEmotes.map((aggregatedEmote, index) => {
+                        return <Emoji key={index} symbol={aggregatedEmote.emote} />
+                    })}
+                </div>
+            );
         }
-    }
-
-    const handleOnClickEmote = (changedEmote) => {
-
-        const updatedEmotes = emotes.map((emote) => {
-            if (emote.id === changedEmote.id) {
-                changedEmote.active = !changedEmote.active
-                return changedEmote
-            }
-            else {
-                return emote
-            }
-        })
-        postEmotes(changedEmote)
-        setEmotes(updatedEmotes)
-    }
+    };
 
     return (
         <>
             <div>
                 List of emojis:
                 {renderEmotes()}
+                {error && <div style={{ color: 'red' }}>{error}</div>}
             </div>
             <div>
                 Aggregated emoji:
                 {renderAggregatedEmotes()}
             </div>
         </>
-    )
+    );
 }

@@ -1,6 +1,6 @@
-import { io } from "socket.io-client"
+import { io } from "socket.io-client";
 
-const URL = "http://localhost:3001"
+const URL = "http://localhost:3001";
 
 export const socket = io(URL, {
     transports: ["websocket", "polling"],
@@ -11,16 +11,16 @@ export const socket = io(URL, {
 });
 
 export const connectSocket = (setIsConnected) => {
-    socket.connect()
+    socket.connect();
 
     socket.on("connect", (data) => {
-        setIsConnected(true)
+        setIsConnected(true);
     });
 
     socket.on("disconnect", (reason) => {
-        setIsConnected(false)
+        setIsConnected(false);
         if (reason === "transport close") {
-            socket.connect()
+            socket.connect();
         }
     })
 
@@ -31,12 +31,11 @@ export const connectSocket = (setIsConnected) => {
     socket.on("error", (err) => {
         console.log("General socket error:", err);
     });
-}
+};
 
 export const disconnectSocket = () => {
     socket.off("connect");
     socket.off("disconnect");
     socket.off("connect_error");
     socket.off("error");
-    // socket.disconnect();
-}
+};

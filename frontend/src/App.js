@@ -7,7 +7,7 @@ import { Interval } from './Interval';
 import { Threshold } from './Threshold';
 
 const App = () => {
-  const [isConnected, setIsConnected] = useState(socket.connected)
+  const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
     connectSocket(setIsConnected);
@@ -15,7 +15,7 @@ const App = () => {
     return () => {
       disconnectSocket();
     }
-  }, [])
+  }, []);
 
   return (
     <div>
