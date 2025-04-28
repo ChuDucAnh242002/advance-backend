@@ -11,6 +11,7 @@ export const socket = io(URL, {
 });
 
 export const connectSocket = (setIsConnected) => {
+    // Initialize socket event listeners
     socket.connect();
 
     socket.on("connect", (data) => {
@@ -34,6 +35,7 @@ export const connectSocket = (setIsConnected) => {
 };
 
 export const disconnectSocket = () => {
+    // Remove event listeners in order to prevent duplicate event registrations.
     socket.off("connect");
     socket.off("disconnect");
     socket.off("connect_error");

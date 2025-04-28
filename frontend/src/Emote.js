@@ -11,6 +11,7 @@ export const Emote = () => {
 
     useEffect(() => {
         const handleSocketMessage = (message) => {
+            // This function get the message as json from socket. Decode the message and get the aggregated emote
             try {
                 const decoder = new TextDecoder("utf-8");
                 const jsonstring = decoder.decode(message.value);
@@ -23,6 +24,7 @@ export const Emote = () => {
         };
 
         const loadData = async () => {
+            // This function first load the Emotes that fetched from server_b then put the socket to listen to "aggregatedEmoteData"
             try {
                 setError(null);
                 await loadEmotes();
@@ -36,6 +38,7 @@ export const Emote = () => {
         loadData();
 
         return () => {
+            // Event listener registered must be removed in order to prevent duplicate event registrations.
             socket.off("aggregatedEmoteData");
         }
     }, []);
@@ -77,6 +80,7 @@ export const Emote = () => {
     };
 
     const renderEmotes = () => {
+        // When the Emote component fails to get the allowed-emotes from server_b, 4 default emotes will be displayed
         if (emotes.length === 0) {
             return (
                 <div>
