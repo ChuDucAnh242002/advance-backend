@@ -20,9 +20,11 @@ Node.js is not required to run the complete application with Docker Compose.
 
 ## Continuous integration
 
-GitHub Actions validates the Compose configuration and builds the application
-images on pull requests and pushes to `main`. It does not start the services or
-test their Kafka integration.
+GitHub Actions validates the Compose configuration, builds and starts the
+application, and smoke-tests the frontend, settings API, Socket.IO endpoint,
+and generated Kafka events on pull requests and pushes to `main`. It collects
+service logs on failure and stops the stack afterward. The smoke test does not
+verify the full aggregated-event path or browser interactions.
 
 ## Install and start
 
@@ -40,6 +42,9 @@ docker compose up --build
 ```
 
 The first start builds the application images and may take several minutes. Leave this terminal open while using the application. Open [http://localhost:3000](http://localhost:3000) in a browser.
+
+The stack uses Apache Kafka 4.1.0. A one-shot `kafka-init` service creates the
+two topics and waits for their leaders before the application services start.
 
 To stop the services, press `Ctrl+C`. To stop and remove the containers afterwards, run:
 
