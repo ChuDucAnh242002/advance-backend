@@ -18,6 +18,12 @@ The emotes are generated sample data; the application does not connect to a live
 
 Node.js is not required to run the complete application with Docker Compose.
 
+## Continuous integration
+
+GitHub Actions validates the Compose configuration and builds the application
+images on pull requests and pushes to `main`. It does not start the services or
+test their Kafka integration.
+
 ## Install and start
 
 Clone the repository and move into its directory if you have not already done so:
