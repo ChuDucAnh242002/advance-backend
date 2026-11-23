@@ -5,37 +5,71 @@
 
 services:
 
-  # You can base this service on a bitnami/kafka Docker Hub image.
+  # Single-node Kafka broker and KRaft controller.
   # You need to expose the kafka port to other containers
   # in this  docker-compose.yml
   # A set of needed Docker instructions like 'image:' are shown
   # below, groups should set their values. Groups are free to
   # CRUD the set of instructions as they see fit.
   kafka:
-    image: bitnami/kafka:latest
+    image: apache/kafka:4.1.0
     ports:
       - "9092:9092"
     environment:
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_ENABLE_KRAFT=yes
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=controller,broker
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "kafka-topics.sh", "--bootstrap-server", "kafka:9092", "--list"]
-      interval: 5s
-      retries: 5
-      start_period: 10s
+      test: ["CMD", "/opt/kafka/bin/kafka-topics.sh", "--bootstrap-server", "kafka:9092", "--list"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 40s
+
+  kafka-init:
+    image: apache/kafka:4.1.0
+    entrypoint: ["/bin/bash", "-ec"]
+    command:
+      - |
+        for topic in raw-emote-data aggregated-emote-data; do
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 \
+            --create --if-not-exists --topic "$$topic" --partitions 1 --replication-factor 1
+          ready=false
+          for attempt in $$(seq 1 30); do
+            if /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 \
+              --describe --topic "$$topic" | grep -q 'Leader: 1'; then
+              ready=true
+              break
+            fi
+            sleep 2
+          done
+          if [ "$$ready" != true ]; then
+            echo "Kafka topic $$topic did not become ready" >&2
+            exit 1
+          fi
+        done
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - backend
 
   emotegen:
     build: ./backend/emotegen
     depends_on:
-      kafka:
+      kafka-init:
+        condition: service_completed_successfully
+      server_b:
         condition: service_healthy
     environment:
       - KAFKA_BROKER=kafka:9092
@@ -47,8 +81,8 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      kafka:
-        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
     environment:
       - KAFKA_BROKER=kafka:9092
     networks:
@@ -60,13 +94,18 @@ services:
       ports:
         - "8000:8000"
       depends_on:
-        kafka:
-          condition: service_healthy
+        kafka-init:
+          condition: service_completed_successfully
       environment:
         - KAFKA_BROKER=kafka:9092
       networks:
         - backend
         - frontend
+      healthcheck:
+        test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8000/settings/interval', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+        interval: 5s
+        timeout: 3s
+        retries: 12
 
   frontend:
     build: ./frontend
