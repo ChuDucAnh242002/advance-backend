@@ -26,6 +26,13 @@ and generated Kafka events on pull requests and pushes to `main`. It collects
 service logs on failure and stops the stack afterward. The smoke test does not
 verify the full aggregated-event path or browser interactions.
 
+Dependabot proposes weekly npm and Actions updates with a small open-PR limit.
+Review and merge them only after the existing Compose build/start/event smoke
+checks pass. Remaining advisories are not waived by enabling updates: prioritize
+runtime exposure and patch availability, keep lockfile changes focused, and
+handle incompatible `react-scripts` toolchain updates separately rather than
+running `npm audit fix --force`.
+
 ## Install and start
 
 Clone the repository and move into its directory if you have not already done so:
